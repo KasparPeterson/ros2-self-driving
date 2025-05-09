@@ -20,7 +20,12 @@ def generate_launch_description():
         cmd=['ros2', 'launch', 'ros_gz_sim', 'gz_sim.launch.py', f'gz_args:={world}'],
         output='screen'
     )
+    cmd_vel_bridge = ExecuteProcess(
+        cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist'],
+        output='screen'
+    )
 
     return LaunchDescription([
         gazebo,
+        cmd_vel_bridge
     ])

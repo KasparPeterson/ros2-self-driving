@@ -14,11 +14,5 @@ source install/setup.bash
 
 ```shell
 ros2 launch self_driving self_driving_world.launch.py
-```
-
-```shell
-gz topic -t "/cmd_vel" -m gz.msgs.Twist -p "linear: {x: 0.5}, angular: {z: 0.1}"
-
-ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
 ros2 run self_driving self_driver
 ```

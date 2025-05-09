@@ -17,6 +17,10 @@ from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
 
+TIMER_PERIOD_SECONDS = 1
+LINEAR_X = 0.5  # Speed
+ANGULAR_Z = 0.5
+
 
 class SelfDriver(Node):
 
@@ -24,18 +28,17 @@ class SelfDriver(Node):
         super().__init__('self_driver')
         # self.publisher = self.create_publisher(Twist, '/cmd_vel', rclpy.qos.qos_profile_system_default)
         self.publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        timer_period = 5  # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
+        self.timer = self.create_timer(TIMER_PERIOD_SECONDS, self.timer_callback)
+        self.z = ANGULAR_Z
 
     def timer_callback(self):
         msg = Twist()
-        msg.linear.x = 0.5
-        msg.angular.z = 0.1
+        msg.linear.x = LINEAR_X
+        msg.angular.z = self.z
+        self.z = self.z * -1
 
         self.get_logger().info(f'Publishing: {msg}')
         self.publisher.publish(msg)
-        self.i += 1
 
 
 def main(args=None):
