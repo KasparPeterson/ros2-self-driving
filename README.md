@@ -5,6 +5,7 @@ Robot drives to a given coordinates.
 ## Setup
 
 ```shell
+export GZ_SIM_RESOURCE_PATH=/mnt/utm/self_driving/src/self_driving/models:$GZ_SIM_RESOURCE_PATH
 rosdep install -r --from-paths src -i -y --rosdistro jazzy
 colcon build --packages-select self_driving
 source install/setup.bash
