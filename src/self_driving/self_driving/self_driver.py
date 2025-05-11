@@ -20,9 +20,10 @@ from geometry_msgs.msg import Twist
 from tf2_ros import TransformListener, Buffer
 from nav_msgs.msg import Odometry
 
-TIMER_PERIOD_SECONDS = 1
-LINEAR_X = 0.5  # Speed
-ANGULAR_Z = 0.5
+from self_driving.domain import twist_calculator
+from self_driving.domain.entities import DesiredTwist
+from self_driving.domain.entities import Odometer
+from self_driving.domain.entities import Target
 
 
 class SelfDriver(Node):
@@ -31,8 +32,9 @@ class SelfDriver(Node):
         super().__init__('self_driver')
         self.get_logger().info(f'Initializing Self Driver with x={x}, y={y}')
         self.publisher = self.create_publisher(Twist, '/cmd_vel', rclpy.qos.qos_profile_system_default)
-        self.timer = self.create_timer(TIMER_PERIOD_SECONDS, self.timer_callback)
-        self.z = ANGULAR_Z
+        # self.timer = self.create_timer(TIMER_PERIOD_SECONDS, self.timer_callback)
+        self.target = Target(x=x, y=y)
+        self.odometer = Odometer(x=0, y=0, orientation_z=0)
 
         self.create_subscription(
             Odometry,
@@ -41,20 +43,25 @@ class SelfDriver(Node):
             rclpy.qos.qos_profile_system_default,
         )
 
-    def timer_callback(self):
-        msg = Twist()
-        msg.linear.x = LINEAR_X
-        msg.angular.z = self.z
-        self.z = self.z * -1
-
-        self.get_logger().info(f'Publishing: {msg}')
-        self.publisher.publish(msg)
-
     def odometry_callback(self, msg):
         position = msg.pose.pose.position
         orientation = msg.pose.pose.orientation
-        self.get_logger().info(f'Position: x={position.x}, y={position.y}, z={position.z}')
-        self.get_logger().info(f'Orientation: x={orientation.x}, y={orientation.y}, z={orientation.z}, w={orientation.w}')
+        self.odometer = Odometer(x=position.x, y=position.y, orientation_z=orientation.z)
+        # self.get_logger().info(f'Position: x={position.x}, y={position.y}, z={position.z}')
+        # self.get_logger().info(f'Orientation: x={orientation.x}, y={orientation.y}, z={orientation.z}, w={orientation.w}')
+        self.get_logger().info(f'Odometer: {self.odometer}')
+        self.publish_twist()
+
+    def publish_twist(self):
+        desired_twist: DesiredTwist = twist_calculator.execute(self.target, self.odometer)
+        if desired_twist:
+            self.get_logger().info(f'Got DesiredTwist: {desired_twist}')
+            msg = Twist()
+            msg.linear.x = desired_twist.x
+            msg.angular.z = desired_twist.orientation_z
+
+            self.get_logger().info(f'Publishing: {msg}')
+            self.publisher.publish(msg)
 
 
 def main(args=None):

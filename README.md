@@ -2,6 +2,10 @@
 
 Robot drives to a given coordinates.
 
+- [x] drives to a given CLI coordinates
+- [ ] subscribe to a target coordinates
+- [ ] avoid obstacles from the lidar
+
 ## Setup
 
 ```shell
