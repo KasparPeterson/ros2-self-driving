@@ -24,6 +24,10 @@ def generate_launch_description():
         cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist'],
         output='screen'
     )
+    parameter_bridge = ExecuteProcess(
+        cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', '/model/vehicle_blue/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
+        output='screen'
+    )
     """robot_description = {"robot_description": robot_description_content}
     robot_state_pub_node = Node(
         package="robot_state_publisher",
@@ -60,6 +64,7 @@ def generate_launch_description():
     return LaunchDescription([
         gazebo,
         cmd_vel_bridge,
+        parameter_bridge,
         robot_state_publisher,
         joint_state_publisher,
     ])

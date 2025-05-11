@@ -18,6 +18,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import TransformStamped
 from geometry_msgs.msg import Twist
 from tf2_ros import TransformListener, Buffer
+from nav_msgs.msg import Odometry
 
 TIMER_PERIOD_SECONDS = 1
 LINEAR_X = 0.5  # Speed
@@ -33,10 +34,12 @@ class SelfDriver(Node):
         self.timer = self.create_timer(TIMER_PERIOD_SECONDS, self.timer_callback)
         self.z = ANGULAR_Z
 
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
-        # Timer to periodically check TF
-        self.create_timer(0.5, self.get_robot_pose)
+        self.create_subscription(
+            Odometry,
+            '/model/vehicle_blue/odometry',
+            self.odometry_callback,
+            rclpy.qos.qos_profile_system_default,
+        )
 
     def timer_callback(self):
         msg = Twist()
@@ -47,19 +50,11 @@ class SelfDriver(Node):
         self.get_logger().info(f'Publishing: {msg}')
         self.publisher.publish(msg)
 
-    def get_robot_pose(self):
-        try:
-            # Replace 'world' and 'base_link' with your actual frames
-            now = rclpy.time.Time()
-            trans: TransformStamped = self.tf_buffer.lookup_transform(
-                'car_world', 'base_link', now)
-
-            pos = trans.transform.translation
-            rot = trans.transform.rotation
-            self.get_logger().info(f'Position: x={pos.x}, y={pos.y}, z={pos.z}')
-            self.get_logger().info(f'Orientation: x={rot.x}, y={rot.y}, z={rot.z}, w={rot.w}')
-        except Exception as e:
-            self.get_logger().warn(f'Could not get transform: {e}')
+    def odometry_callback(self, msg):
+        position = msg.pose.pose.position
+        orientation = msg.pose.pose.orientation
+        self.get_logger().info(f'Position: x={position.x}, y={position.y}, z={position.z}')
+        self.get_logger().info(f'Orientation: x={orientation.x}, y={orientation.y}, z={orientation.z}, w={orientation.w}')
 
 
 def main(args=None):
