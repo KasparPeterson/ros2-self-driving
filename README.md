@@ -3,13 +3,19 @@
 Robot drives to a given coordinates.
 
 - [x] drives to a given CLI coordinates
-- [ ] subscribe to a target coordinates
-- [ ] avoid obstacles from the lidar
+- [ ] give coordinates dynamically and subscribe to a target coordinates
+- [ ] avoid obstacles with the lidar
+- [ ] avoid obstacles with camera
+- [ ] learn the environment SLAM
 
 ## Setup
 
 ```shell
 export GZ_SIM_RESOURCE_PATH=/mnt/utm/self_driving/src/self_driving/models:$GZ_SIM_RESOURCE_PATH
+export GZ_PLUGIN_PATH=/usr/lib/aarch64-linux-gnu/gz-sim-8/plugins:$GZ_PLUGIN_PATH
+export GZ_PLUGIN_PATH=/usr/lib/aarch64-linux-gnu/gz-gui-8/plugins:$GZ_PLUGIN_PATH
+
+
 rosdep install -r --from-paths src -i -y --rosdistro jazzy
 colcon build --packages-select self_driving
 source install/setup.bash
@@ -19,5 +25,5 @@ source install/setup.bash
 
 ```shell
 ros2 launch self_driving self_driving_world.launch.py
-ros2 run self_driving self_driver
+ros2 run self_driving self_driver 10 0
 ```

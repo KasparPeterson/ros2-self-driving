@@ -12,9 +12,8 @@ def generate_launch_description():
     world_file_name = 'car_world.world'
     world = os.path.join(get_package_share_directory('self_driving'), world_file_name)
 
-    print("\nWorld:")
-    print(world)
-    print("\n")
+    print("DEBUG generate_launch_description")
+    print("World:", world)
 
     gazebo = ExecuteProcess(
         cmd=['ros2', 'launch', 'ros_gz_sim', 'gz_sim.launch.py', f'gz_args:={world}'],
@@ -28,15 +27,13 @@ def generate_launch_description():
         cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', '/model/vehicle_blue/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry'],
         output='screen'
     )
-    """robot_description = {"robot_description": robot_description_content}
-    robot_state_pub_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="both",
-        parameters=[robot_description],
-    )"""
+    lidar_bridge = ExecuteProcess(
+        cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge',
+             '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'],
+        output='screen'
+    )
 
-    print("SHARE DIRECTORY:", get_package_share_directory('self_driving'))
+    print("get_package_share_directory:", get_package_share_directory('self_driving'))
 
     urdf_file = os.path.join(
         get_package_share_directory('self_driving'),
@@ -45,7 +42,7 @@ def generate_launch_description():
         'model.sdf'
     )
 
-    print("URDF FILE:", urdf_file)
+    print("urdf_file:", urdf_file)
     with open(urdf_file, 'r') as file:
         robot_description = file.read()
 
@@ -65,6 +62,7 @@ def generate_launch_description():
         gazebo,
         cmd_vel_bridge,
         parameter_bridge,
+        lidar_bridge,
         robot_state_publisher,
         joint_state_publisher,
     ])

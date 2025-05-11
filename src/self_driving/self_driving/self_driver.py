@@ -20,11 +20,14 @@ from geometry_msgs.msg import Twist
 from tf2_ros import TransformListener, Buffer
 from nav_msgs.msg import Odometry
 from tf_transformations import euler_from_quaternion
+from sensor_msgs.msg import LaserScan
 
 from self_driving.domain import twist_calculator
 from self_driving.domain.entities import DesiredTwist
 from self_driving.domain.entities import Odometer
 from self_driving.domain.entities import Target
+
+LIDAR_TOO_CLOSE = 2.0
 
 
 class SelfDriver(Node):
@@ -43,8 +46,34 @@ class SelfDriver(Node):
             self.odometry_callback,
             rclpy.qos.qos_profile_system_default,
         )
+        self.create_subscription(
+            LaserScan,
+            '/lidar',
+            self.lidar_callback,
+            10
+        )
+
+        # TODO: add lidar data to twist calculator for going around the obstacles
+        self.is_lidar_too_close = False
+
+    def lidar_callback(self, msg):
+        if self.is_lidar_too_close:
+            return
+
+        ranges = msg.ranges
+        # Process LIDAR data (360 degrees, 0 = front, 180 = rear)
+        min_distance = min(ranges[0:60] + ranges[300:360])  # Check front 120 degrees
+        self.get_logger().info(f'Lidar min_distance: {min_distance}')
+        if min_distance < LIDAR_TOO_CLOSE:
+            self.is_lidar_too_close = True
+            msg = Twist()
+            self.get_logger().info(f'Publish stop Twist msg: {msg}')
+            self.publisher.publish(msg)
 
     def odometry_callback(self, msg):
+        if self.is_lidar_too_close:
+            return
+
         position = msg.pose.pose.position
         orientation_q = msg.pose.pose.orientation
         # Convert quaternion to tuple
