@@ -17,7 +17,7 @@ setup(
         (os.path.join('share', package_name), glob('worlds/*.world')),
         (os.path.join('share', package_name, 'models', 'robot'), glob('models/robot/*')),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'tf-transformations'],
     zip_safe=True,
     maintainer='ubuntu',
     maintainer_email='ubuntu@todo.todo',

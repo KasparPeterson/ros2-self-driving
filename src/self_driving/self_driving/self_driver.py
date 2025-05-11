@@ -19,6 +19,7 @@ from geometry_msgs.msg import TransformStamped
 from geometry_msgs.msg import Twist
 from tf2_ros import TransformListener, Buffer
 from nav_msgs.msg import Odometry
+from tf_transformations import euler_from_quaternion
 
 from self_driving.domain import twist_calculator
 from self_driving.domain.entities import DesiredTwist
@@ -45,8 +46,19 @@ class SelfDriver(Node):
 
     def odometry_callback(self, msg):
         position = msg.pose.pose.position
-        orientation = msg.pose.pose.orientation
-        self.odometer = Odometer(x=position.x, y=position.y, orientation_z=orientation.z)
+        orientation_q = msg.pose.pose.orientation
+        # Convert quaternion to tuple
+        quaternion = (
+            orientation_q.x,
+            orientation_q.y,
+            orientation_q.z,
+            orientation_q.w
+        )
+
+        # Convert to Euler angles (roll, pitch, yaw)
+        roll, pitch, yaw = euler_from_quaternion(quaternion)
+
+        self.odometer = Odometer(x=position.x, y=position.y, orientation_z=yaw)
         # self.get_logger().info(f'Position: x={position.x}, y={position.y}, z={position.z}')
         # self.get_logger().info(f'Orientation: x={orientation.x}, y={orientation.y}, z={orientation.z}, w={orientation.w}')
         self.get_logger().info(f'Odometer: {self.odometer}')
@@ -61,6 +73,9 @@ class SelfDriver(Node):
             msg.angular.z = desired_twist.orientation_z
 
             self.get_logger().info(f'Publishing: {msg}')
+            self.get_logger().info(f'DEBUG, x: {self.odometer.x:.2f}, y: {self.odometer.y:.2f}, '
+                                   f'orientation_z: {self.odometer.orientation_z:.2f} AND target x: {msg.linear.x:.2f}'
+                                   f', z: {msg.angular.z:.2f}')
             self.publisher.publish(msg)
 
 
