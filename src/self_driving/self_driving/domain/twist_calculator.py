@@ -8,12 +8,14 @@ from self_driving.domain.entities import LidarSectors
 from self_driving.domain.entities import Target
 
 # TODO: add config file
-SPEED_MAX = 0.5
-SPEED_TARGET_CLOSE = 0.1
+SPEED_MAX = 0.3
+SPEED_SLOW = 0.1
 TARGET_CLOSE = 1.0
 TARGET_REACHED = 0.2
 
-ROTATION_MAX_SPEED = 0.5
+ROTATION_MAX_SPEED = 0.3
+
+LIDAR_TOO_CLOSE = 2.0
 
 
 def execute(target: Target, odometer: Odometer, lidar: Lidar) -> Optional[DesiredTwist]:
@@ -35,6 +37,34 @@ def execute(target: Target, odometer: Odometer, lidar: Lidar) -> Optional[Desire
     distance = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2))
     speed = min(distance, SPEED_MAX)
 
+    # Got desired speed and distance but we need to avoid collision
+    sectors = _get_sectors(lidar)
+    print("\nSECTORS:", sectors)
+    """print("  len:", len(lidar.ranges))
+    print("  0:", lidar.ranges[0])
+    print("  320:", lidar.ranges[320])
+    print("  220:", lidar.ranges[220])
+    print("  420:", lidar.ranges[420])
+    print("  619:", lidar.ranges[619])"""
+    if sectors.front_left < LIDAR_TOO_CLOSE or sectors.front_right < LIDAR_TOO_CLOSE:
+        if sectors.front_left < sectors.front_right:
+            angle_error = -ROTATION_MAX_SPEED
+        else:
+            angle_error = ROTATION_MAX_SPEED
+        speed = SPEED_SLOW
+        print("FRONT TOO CLOSE!, angle_error:", angle_error)
+        print(f"  front_left: {sectors.front_left}, front_right: {sectors.front_right}")
+    elif sectors.left < LIDAR_TOO_CLOSE:
+        angle_error = 0.0
+        speed = SPEED_SLOW
+        print("LEFT SIDE TOO CLOSE!, angle_error:", angle_error)
+    elif sectors.right < LIDAR_TOO_CLOSE:
+        angle_error = 0.0
+        speed = SPEED_SLOW
+        print("RIGHT SIDE TOO CLOSE!, angle_error:", angle_error)
+
+    print("\n")
+
     if distance < TARGET_REACHED:
         return DesiredTwist(x=0.0, orientation_z=0.0)
 
@@ -42,25 +72,33 @@ def execute(target: Target, odometer: Odometer, lidar: Lidar) -> Optional[Desire
 
 
 def _get_sectors(lidar: Lidar) -> LidarSectors:
+    if lidar.ranges is None or len(lidar.ranges) == 0:
+        return LidarSectors(
+            front_left=math.inf,
+            front_right=math.inf,
+            left=math.inf,
+            right=math.inf,
+        )
+
     start_degree = _rad_to_deg(lidar.angle_min)
     end_degree = _rad_to_deg(lidar.angle_max)
     center = len(lidar.ranges) // 2
     degree_increment = (end_degree - start_degree) / len(lidar.ranges)
 
     deg_60 = int(60 / degree_increment)
-    left_start = center - 2 * deg_60
-    if left_start < 0:
-        left_start = 0
+    right_start = center - 2 * deg_60
+    if right_start < 0:
+        right_start = 0
 
-    right_end = center + 2 * deg_60
-    if right_end > len(lidar.ranges):
-        right_end = len(lidar.ranges)
+    left_end = center + 2 * deg_60
+    if left_end > len(lidar.ranges):
+        left_end = len(lidar.ranges)
 
     return LidarSectors(
-        front_right=min(lidar.ranges[center:center + deg_60]),
-        front_left=min(lidar.ranges[center - deg_60:center]),
-        left=min(lidar.ranges[left_start:center - deg_60]),
-        right=min(lidar.ranges[center + deg_60:right_end]),
+        front_left=min(lidar.ranges[center:center + deg_60]),
+        front_right=min(lidar.ranges[center - deg_60:center]),
+        left=min(lidar.ranges[center + deg_60: left_end]),
+        right=min(lidar.ranges[right_start:center - deg_60]),
         back_right=0,
         back_left=0,
     )

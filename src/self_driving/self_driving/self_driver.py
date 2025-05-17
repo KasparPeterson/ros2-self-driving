@@ -30,8 +30,6 @@ from self_driving.domain.entities import Target
 
 from self_driving.domain.entities import Lidar
 
-LIDAR_TOO_CLOSE = 2.0
-
 
 class SelfDriver(Node):
 
