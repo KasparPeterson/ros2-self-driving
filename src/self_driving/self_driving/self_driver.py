@@ -21,6 +21,7 @@ from tf2_ros import TransformListener, Buffer
 from nav_msgs.msg import Odometry
 from tf_transformations import euler_from_quaternion
 from sensor_msgs.msg import LaserScan
+from message_filters import Subscriber, ApproximateTimeSynchronizer
 
 from self_driving.domain import twist_calculator
 from self_driving.domain.entities import DesiredTwist
@@ -40,27 +41,23 @@ class SelfDriver(Node):
         self.target = Target(x=x, y=y)
         self.odometer = Odometer(x=0, y=0, orientation_z=0)
 
-        self.create_subscription(
-            Odometry,
-            '/model/vehicle_blue/odometry',
-            self.odometry_callback,
-            rclpy.qos.qos_profile_system_default,
-        )
-        self.create_subscription(
-            LaserScan,
-            '/lidar',
-            self.lidar_callback,
-            10
-        )
+        odometry_subscriber = Subscriber(self, Odometry, "/model/vehicle_blue/odometry")
+        lidar_subscriber = Subscriber(self, LaserScan, "/lidar")
 
+        queue_size = 10
+        max_delay = 0.05
+        self.time_sync = ApproximateTimeSynchronizer(
+            [odometry_subscriber, lidar_subscriber],
+            queue_size, max_delay)
+        self.time_sync.registerCallback(self.sync_callback)
         # TODO: add lidar data to twist calculator for going around the obstacles
         self.is_lidar_too_close = False
 
-    def lidar_callback(self, msg):
+    def sync_callback(self, odom, lidar):
         if self.is_lidar_too_close:
             return
 
-        ranges = msg.ranges
+        ranges = lidar.ranges
         # Process LIDAR data (360 degrees, 0 = front, 180 = rear)
         min_distance = min(ranges[0:60] + ranges[300:360])  # Check front 120 degrees
         self.get_logger().info(f'Lidar min_distance: {min_distance}')
@@ -69,13 +66,10 @@ class SelfDriver(Node):
             msg = Twist()
             self.get_logger().info(f'Publish stop Twist msg: {msg}')
             self.publisher.publish(msg)
-
-    def odometry_callback(self, msg):
-        if self.is_lidar_too_close:
             return
 
-        position = msg.pose.pose.position
-        orientation_q = msg.pose.pose.orientation
+        position = odom.pose.pose.position
+        orientation_q = odom.pose.pose.orientation
         # Convert quaternion to tuple
         quaternion = (
             orientation_q.x,
