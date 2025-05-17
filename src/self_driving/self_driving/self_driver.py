@@ -28,6 +28,8 @@ from self_driving.domain.entities import DesiredTwist
 from self_driving.domain.entities import Odometer
 from self_driving.domain.entities import Target
 
+from self_driving.domain.entities import Lidar
+
 LIDAR_TOO_CLOSE = 2.0
 
 
@@ -40,6 +42,7 @@ class SelfDriver(Node):
         # self.timer = self.create_timer(TIMER_PERIOD_SECONDS, self.timer_callback)
         self.target = Target(x=x, y=y)
         self.odometer = Odometer(x=0, y=0, orientation_z=0)
+        self.lidar = Lidar(angle_min=0, angle_max=0, ranges=[])
 
         odometry_subscriber = Subscriber(self, Odometry, "/model/vehicle_blue/odometry")
         lidar_subscriber = Subscriber(self, LaserScan, "/lidar")
@@ -50,23 +53,9 @@ class SelfDriver(Node):
             [odometry_subscriber, lidar_subscriber],
             queue_size, max_delay)
         self.time_sync.registerCallback(self.sync_callback)
-        # TODO: add lidar data to twist calculator for going around the obstacles
-        self.is_lidar_too_close = False
 
     def sync_callback(self, odom, lidar):
-        if self.is_lidar_too_close:
-            return
-
-        ranges = lidar.ranges
-        # Process LIDAR data (360 degrees, 0 = front, 180 = rear)
-        min_distance = min(ranges[0:60] + ranges[300:360])  # Check front 120 degrees
-        self.get_logger().info(f'Lidar min_distance: {min_distance}')
-        if min_distance < LIDAR_TOO_CLOSE:
-            self.is_lidar_too_close = True
-            msg = Twist()
-            self.get_logger().info(f'Publish stop Twist msg: {msg}')
-            self.publisher.publish(msg)
-            return
+        self.lidar = Lidar(angle_min=lidar.angle_min, angle_max=lidar.angle_max, ranges=lidar.ranges)
 
         position = odom.pose.pose.position
         orientation_q = odom.pose.pose.orientation
@@ -88,7 +77,7 @@ class SelfDriver(Node):
         self.publish_twist()
 
     def publish_twist(self):
-        desired_twist: DesiredTwist = twist_calculator.execute(self.target, self.odometer)
+        desired_twist: DesiredTwist = twist_calculator.execute(self.target, self.odometer, self.lidar)
         if desired_twist:
             self.get_logger().info(f'Got DesiredTwist: {desired_twist}')
             msg = Twist()

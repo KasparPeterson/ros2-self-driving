@@ -3,7 +3,8 @@ from typing import Optional
 
 from self_driving.domain.entities import DesiredTwist
 from self_driving.domain.entities import Odometer
-
+from self_driving.domain.entities import Lidar
+from self_driving.domain.entities import LidarSectors
 from self_driving.domain.entities import Target
 
 # TODO: add config file
@@ -15,7 +16,7 @@ TARGET_REACHED = 0.2
 ROTATION_MAX_SPEED = 0.5
 
 
-def execute(target: Target, odometer: Odometer) -> Optional[DesiredTwist]:
+def execute(target: Target, odometer: Odometer, lidar: Lidar) -> Optional[DesiredTwist]:
     dx = target.x - odometer.x
     dy = target.y - odometer.y
     desired_angle = math.atan2(dy, dx)
@@ -39,3 +40,31 @@ def execute(target: Target, odometer: Odometer) -> Optional[DesiredTwist]:
 
     return DesiredTwist(x=speed, orientation_z=angle_error)
 
+
+def _get_sectors(lidar: Lidar) -> LidarSectors:
+    start_degree = _rad_to_deg(lidar.angle_min)
+    end_degree = _rad_to_deg(lidar.angle_max)
+    center = len(lidar.ranges) // 2
+    degree_increment = (end_degree - start_degree) / len(lidar.ranges)
+
+    deg_60 = int(60 / degree_increment)
+    left_start = center - 2 * deg_60
+    if left_start < 0:
+        left_start = 0
+
+    right_end = center + 2 * deg_60
+    if right_end > len(lidar.ranges):
+        right_end = len(lidar.ranges)
+
+    return LidarSectors(
+        front_right=min(lidar.ranges[center:center + deg_60]),
+        front_left=min(lidar.ranges[center - deg_60:center]),
+        left=min(lidar.ranges[left_start:center - deg_60]),
+        right=min(lidar.ranges[center + deg_60:right_end]),
+        back_right=0,
+        back_left=0,
+    )
+
+
+def _rad_to_deg(rad):
+    return rad * 180 / math.pi
