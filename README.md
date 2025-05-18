@@ -12,6 +12,7 @@ Robot drives to a given coordinates.
 
 ```shell
 export GZ_SIM_RESOURCE_PATH=/mnt/utm/self_driving/src/self_driving/models:$GZ_SIM_RESOURCE_PATH
+export GZ_SIM_RESOURCE_PATH=/media/psf/UTMCodeSharedUbuntu/self_driving/src/self_driving/models:$GZ_SIM_RESOURCE_PATH
 export GZ_PLUGIN_PATH=/usr/lib/aarch64-linux-gnu/gz-sim-8/plugins:$GZ_PLUGIN_PATH
 export GZ_PLUGIN_PATH=/usr/lib/aarch64-linux-gnu/gz-gui-8/plugins:$GZ_PLUGIN_PATH
 
