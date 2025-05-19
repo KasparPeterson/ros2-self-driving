@@ -16,7 +16,7 @@ def generate_launch_description():
     print("World:", world)
 
     gazebo = ExecuteProcess(
-        cmd=['ros2', 'launch', 'ros_gz_sim', 'gz_sim.launch.py', f'gz_args:={world}'],
+        cmd=['ros2', 'launch', 'ros_gz_sim', 'gz_sim.launch.py', 'use_sim_time:=true',  f'gz_args:={world}'],
         output='screen'
     )
     cmd_vel_bridge = ExecuteProcess(
@@ -32,6 +32,10 @@ def generate_launch_description():
              '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan'],
         output='screen'
     )
+    clock_bridge = ExecuteProcess(
+        cmd=['ros2', 'run', 'ros_gz_bridge', 'parameter_bridge', '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen',
+    )
 
     print("get_package_share_directory:", get_package_share_directory('self_driving'))
 
@@ -39,7 +43,7 @@ def generate_launch_description():
         get_package_share_directory('self_driving'),
         'models',
         'robot',
-        'model.sdf'
+        'model.urdf'
     )
 
     print("urdf_file:", urdf_file)
@@ -50,12 +54,16 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
-        parameters=[{'robot_description': robot_description}]
+        parameters=[
+            {'use_sim_time': True},
+            {'robot_description': robot_description},
+        ]
     )
     joint_state_publisher = Node(
         package='joint_state_publisher',
         executable='joint_state_publisher',
         name='joint_state_publisher',
+        parameters=[{'use_sim_time': True}],
     )
 
     return LaunchDescription([
@@ -63,6 +71,7 @@ def generate_launch_description():
         cmd_vel_bridge,
         parameter_bridge,
         lidar_bridge,
+        clock_bridge,
         robot_state_publisher,
-        joint_state_publisher,
+        # joint_state_publisher,
     ])

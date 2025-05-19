@@ -8,8 +8,12 @@
             <right_joint>right_wheel_joint</right_joint>
             <wheel_separation>1.2</wheel_separation>
             <wheel_radius>0.4</wheel_radius>
-            <odom_publish_frequency>1</odom_publish_frequency>
+            <odom_publish_frequency>30</odom_publish_frequency>
+            <update_rate>50</update_rate>
             <topic>cmd_vel</topic>
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
 
         <!--<pose relative_to='world'>0 0 0 0 0 0</pose>-->
@@ -226,7 +230,7 @@
             <sensor name='gpu_lidar' type='gpu_lidar'>"
                 <pose relative_to='lidar_frame'>0 0 0 0 0 0</pose>
                 <topic>lidar</topic>
-                <update_rate>10</update_rate>
+                <update_rate>50</update_rate>
                 <ray>
                     <scan>
                         <horizontal>
@@ -262,6 +266,18 @@
                 filename="gz-sim-sensors-system"
                 name="gz::sim::systems::Sensors">
             <render_engine>ogre2</render_engine>
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
+        </plugin>
+        <plugin filename="gz-sim-joint-state-publisher-system"
+                name="gz::sim::systems::JointStatePublisher">
+            <topic>joint_states</topic>
+            <joint_name>left_wheel_joint</joint_name>
+            <joint_name>right_wheel_joint</joint_name>
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
 
     </model>

@@ -8,14 +8,23 @@
         <plugin
                 filename="gz-sim-physics-system"
                 name="gz::sim::systems::Physics">
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
         <plugin
                 filename="gz-sim-user-commands-system"
                 name="gz::sim::systems::UserCommands">
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
         <plugin
                 filename="gz-sim-scene-broadcaster-system"
                 name="gz::sim::systems::SceneBroadcaster">
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
         <plugin filename="MinimalScene" name="gz::gui::plugins::MinimalScene">
             <gz-gui>
@@ -33,15 +42,9 @@
                 <near>0.25</near>
                 <far>25000</far>
             </camera_clip>
-        </plugin>
-        <plugin filename="GzSceneManager" name="gz::sim::plugins::WorldStats">
-            <gz-gui>
-                <property key="resizable" type="bool">false</property>
-                <property key="width" type="double">5</property>
-                <property key="height" type="double">5</property>
-                <property key="state" type="string">floating</property>
-                <property key="showTitleBar" type="bool">false</property>
-            </gz-gui>
+            <sim_time>true</sim_time>
+            <real_time>true</real_time>
+            <real_time_factor>true</real_time_factor>
         </plugin>
 
         <!-- World statistics -->
@@ -154,6 +157,48 @@
 
             </link>
         </model>
+
+        <model name='ros_symbol_start'>
+            <static>true</static>
+            <link name="symbol">
+                <collision name='one_one'>
+                    <pose>0.0 0.0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>1.0</radius>
+                            <length>0.25</length>
+                        </cylinder>
+                    </geometry>
+                    <max_contacts>10</max_contacts>
+                    <surface>
+                        <bounce/>
+                        <friction>
+                            <ode/>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                </collision>
+
+                <visual name='one_one'>
+                    <pose>0.0 0.0 0 0 0 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>1.0</radius>
+                            <length>0.25</length>
+                        </cylinder>
+                    </geometry>
+                    <material>
+                        <ambient>1 0 0 1</ambient>
+                        <diffuse>1 0 0 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                        <emissive>0 0 0 1</emissive>
+                    </material>
+                </visual>
+            </link>
+        </model>
+
 
         <!-- Objects -->
         <model name='ros_symbol'>
