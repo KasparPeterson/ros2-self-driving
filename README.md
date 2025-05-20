@@ -10,7 +10,7 @@ Robot drives to a given coordinates.
 
 ## Demo
 
-<video src="assets/demo_first_iteration.mp4" controls width="600"></video>
+<video src="https://github.com/KasparPeterson/ros2-self-driving/raw/refs/heads/main/assets/demo_first_iteration.mp4" controls width="600"></video>
 
 ## Setup
 
