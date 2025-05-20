@@ -100,7 +100,7 @@
                     <geometry>
                         <plane>
                             <normal>0 0 1</normal>
-                            <size>100 100</size>
+                            <size>1000 1000</size>
                         </plane>
                     </geometry>
                     <material>
@@ -118,9 +118,9 @@
 
         <model name='ros_symbol_target'>
             <static>true</static>
-            <link name="symbol">
+            <link name="symbol_target">
                 <collision name='one_one'>
-                    <pose>10.0 0.0 0 0 0 0</pose>
+                    <pose>20.0 0.0 0 0 0 0</pose>
                     <geometry>
                         <cylinder>
                             <radius>1.0</radius>
@@ -140,7 +140,7 @@
                 </collision>
 
                 <visual name='one_one'>
-                    <pose>10.0 0.0 0 0 0 0</pose>
+                    <pose>20.0 0.0 0 0 0 0</pose>
                     <geometry>
                         <cylinder>
                             <radius>1.0</radius>
@@ -199,9 +199,7 @@
             </link>
         </model>
 
-
-        <!-- Objects -->
-        <model name='ros_symbol'>
+        <model name='obstacle1_cylinder'>
             <static>true</static>
             <link name='symbol'>
                 <collision name='one_one'>
@@ -240,6 +238,81 @@
                     </material>
                 </visual>
             </link>
+        </model>
+
+        <model name='obstacle2_boxes'>
+            <static>true</static>
+            <link name='box1'>
+                <collision name='one_one'>
+                    <pose>7.0 2.0 0.25 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1.0 2.0 1.5</size>
+                        </box>
+                    </geometry>
+                    <max_contacts>10</max_contacts>
+                    <surface>
+                        <bounce/>
+                        <friction>
+                            <ode/>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                </collision>
+
+                <visual name='one_one'>
+                    <pose>7.0 2.0 0.25 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1.0 2.0 1.5</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>1 1 1 1</ambient>
+                        <diffuse>1 1 1 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                        <emissive>0 0 0 1</emissive>
+                    </material>
+                </visual>
+            </link>
+            <link name='box2'>
+                <collision name='one_one'>
+                    <pose>13.0 3.0 0.25 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1.0 2.0 1.5</size>
+                        </box>
+                    </geometry>
+                    <max_contacts>10</max_contacts>
+                    <surface>
+                        <bounce/>
+                        <friction>
+                            <ode/>
+                        </friction>
+                        <contact>
+                            <ode/>
+                        </contact>
+                    </surface>
+                </collision>
+
+                <visual name='one_one'>
+                    <pose>13.0 3.0 0.25 0 0 0</pose>
+                    <geometry>
+                        <box>
+                            <size>1.0 2.0 1.5</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <ambient>1 1 1 1</ambient>
+                        <diffuse>1 1 1 1</diffuse>
+                        <specular>0.2 0.2 0.2 1</specular>
+                        <emissive>0 0 0 1</emissive>
+                    </material>
+                </visual>
+            </link>
+
         </model>
     </world>
 </sdf>

@@ -8,8 +8,8 @@ from self_driving.domain.entities import LidarSectors
 from self_driving.domain.entities import Target
 
 # TODO: add config file
-SPEED_MAX = 0.3
-SPEED_SLOW = 0.1
+SPEED_MAX = 0.5
+SPEED_SLOW = 0.2
 TARGET_CLOSE = 1.0
 TARGET_REACHED = 0.2
 
