@@ -9,8 +9,8 @@ Robot drives to a given coordinates.
 - [ ] learn the environment SLAM
 
 ## Demo
-
-<video src="https://github.com/KasparPeterson/ros2-self-driving/raw/refs/heads/main/assets/demo_first_iteration.mp4" controls width="600"></video>
+assets/demo_first_iteration.mp4
+<video src="https://github.com/KasparPeterson/ros2-self-driving/raw/refs/heads/main/assets/demo_first_iteration.mp4"></video>
 
 ## Setup
 
