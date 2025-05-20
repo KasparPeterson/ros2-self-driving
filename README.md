@@ -8,6 +8,10 @@ Robot drives to a given coordinates.
 - [ ] avoid obstacles with camera
 - [ ] learn the environment SLAM
 
+## Demo
+
+<video src="assets/demo_first_iteration.mp4" controls width="600"></video>
+
 ## Setup
 
 ```shell
@@ -26,5 +30,5 @@ source install/setup.bash
 
 ```shell
 ros2 launch self_driving self_driving_world.launch.py
-ros2 run self_driving self_driver 10 0
+ros2 run self_driving self_driver 20 0
 ```
