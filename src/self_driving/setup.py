@@ -27,6 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'self_driver = self_driving.self_driver:main',
+            'drive = self_driving.drive_action_client:main',
         ],
     },
 )

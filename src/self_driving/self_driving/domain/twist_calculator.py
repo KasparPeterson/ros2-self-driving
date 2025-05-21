@@ -39,31 +39,23 @@ def execute(target: Target, odometer: Odometer, lidar: Lidar) -> Optional[Desire
 
     # Got desired speed and distance but we need to avoid collision
     sectors = _get_sectors(lidar)
-    print("\nSECTORS:", sectors)
-    """print("  len:", len(lidar.ranges))
-    print("  0:", lidar.ranges[0])
-    print("  320:", lidar.ranges[320])
-    print("  220:", lidar.ranges[220])
-    print("  420:", lidar.ranges[420])
-    print("  619:", lidar.ranges[619])"""
     if sectors.front_left < LIDAR_TOO_CLOSE or sectors.front_right < LIDAR_TOO_CLOSE:
         if sectors.front_left < sectors.front_right:
             angle_error = -ROTATION_MAX_SPEED
         else:
             angle_error = ROTATION_MAX_SPEED
         speed = SPEED_SLOW
-        print("FRONT TOO CLOSE!, angle_error:", angle_error)
-        print(f"  front_left: {sectors.front_left}, front_right: {sectors.front_right}")
+        # print("FRONT TOO CLOSE!, angle_error:", angle_error)
+        # print(f"  front_left: {sectors.front_left}, front_right: {sectors.front_right}")
     elif sectors.left < LIDAR_TOO_CLOSE:
         angle_error = 0.0
         speed = SPEED_SLOW
-        print("LEFT SIDE TOO CLOSE!, angle_error:", angle_error)
+        # print("LEFT SIDE TOO CLOSE!, angle_error:", angle_error)
     elif sectors.right < LIDAR_TOO_CLOSE:
         angle_error = 0.0
         speed = SPEED_SLOW
-        print("RIGHT SIDE TOO CLOSE!, angle_error:", angle_error)
-
-    print("\n")
+        # print("RIGHT SIDE TOO CLOSE!, angle_error:", angle_error)
+    # print("\n")
 
     if distance < TARGET_REACHED:
         return DesiredTwist(x=0.0, orientation_z=0.0)

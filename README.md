@@ -3,8 +3,8 @@
 Robot drives to a given coordinates.
 
 - [x] drives to a given CLI coordinates
-- [ ] give coordinates dynamically and subscribe to a target coordinates
-- [ ] avoid obstacles with the lidar
+- [x] give coordinates dynamically and subscribe to a target coordinates
+- [x] avoid obstacles with the lidar
 - [ ] avoid obstacles with camera
 - [ ] learn the environment SLAM
 
@@ -31,4 +31,5 @@ source install/setup.bash
 ```shell
 ros2 launch self_driving self_driving_world.launch.py
 ros2 run self_driving self_driver 20 0
+ros2 run self_driving drive 0 10
 ```

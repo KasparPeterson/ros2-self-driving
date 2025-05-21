@@ -28,5 +28,5 @@ sudo apt install ros-jazzy-ros-gz-sim
 sudo apt install ros-jazzy-ros-gz-bridge
 sudo apt install ros-jazzy-joint-state-publisher
 sudo apt-get install ros-jazzy-tf-transformations
-sudo apt-get install ros-jazzy-ros-gz ros-jazzy-gazebo-ros-pkgs
+sudo apt-get install ros-jazzy-ros-gz ros-jazzy-gazebo-ros-pkgs # ?
 ```
